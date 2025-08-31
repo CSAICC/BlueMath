@@ -239,7 +239,8 @@ def show_graph_for_all_vegetations(pca: PCA, rbf: RBF, depth, hs=2.0, hs_l0=0.02
 
 def plot_depthfile(depthfile, ax=None, xlim=None, dxinp=1):
     """
-    Plot depthfile
+    Plot bathymetry data including friction or vegetation area in case active commands
+
     Parameters
     ----------
     depthfile : str
@@ -250,12 +251,7 @@ def plot_depthfile(depthfile, ax=None, xlim=None, dxinp=1):
         x-axis limits.
     dxinp : float, optional
         Increment in x direction.
-    Returns
-    -------
-    None
     """
-
-    "Plot bathymetry data including friction or vegetation area in case active commands"
 
     depth = np.loadtxt(depthfile)
     x = np.arange(0, len(depth) * dxinp, dxinp)
@@ -333,7 +329,6 @@ def plot_scatters_Tp(df_centroids, df_lhs_data, scatter_points_thick=10):
     The function creates scatter plots with:
     - Blue points: LHS data
     - Red points: Centroid data
-
     """
 
     # Note: The following lines should use the function parameters instead of 'mda'
@@ -361,11 +356,13 @@ def get_real_scenarios_from_dataset(lhs_dataset, h0):
     """
     Function to filter the LHS dataset to obtain real scenarios.
     It filters out scenarios that are not physically realistic based on the wave dispersion relation.
+
     Parameters
     ----------
     lhs_dataset : pandas.DataFrame
         DataFrame containing the Latin Hypercube Sampling data with columns:
         'Hs', 'Hs_L0', 'Wv', 'hv', 'Nv'
+
     Returns
     -------
     pandas.DataFrame
@@ -383,4 +380,5 @@ def get_real_scenarios_from_dataset(lhs_dataset, h0):
     df_centroids = df_centroids.loc[(df_centroids["kh"] < 1) & (df_centroids["Tp"] > 7)]
     df_centroids = df_centroids.loc[(df_centroids["h/L"] < 0.5)]
     df_dataset = lhs_dataset.loc[df_centroids.index]
+
     return df_dataset
