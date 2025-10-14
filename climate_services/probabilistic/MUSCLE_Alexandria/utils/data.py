@@ -38,14 +38,15 @@ def load_atmospheric_predictor(
         era5 = (
             era5[variables]
             .sel(
-                latitude=slice(region[3], region[1], 4),
-                longitude=slice(region[0], region[2], 4),
+                latitude=slice(region[3], region[1], 1),
+                longitude=slice(region[0], region[2], 1),
             )
             .load()
         )
         era5["time"] = np.char.decode(era5.time.values, encoding="utf-8").astype(
             "datetime64"  # Convert to datetime64 for time operations
         )
+        era5 = era5.sel(time=slice("1979", "2018"))
 
     if estela:
         estela = xr.open_dataset("inputs/estela_sea.nc")
