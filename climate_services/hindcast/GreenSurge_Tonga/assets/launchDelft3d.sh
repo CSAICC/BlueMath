@@ -1,5 +1,5 @@
 #! /bin/bash 
-
+export PATH=$PATH:/opt/intel/oneapi/mpi/2021.9.0/bin
 ulimit -s unlimited
 # Display usage if no arguments are provided
 
@@ -13,7 +13,7 @@ ulimit -s unlimited
 ##########################
 ######   NO TOCAR   ######
 ##########################
-case_dir=$1
+case_dir=${1:-$(pwd)}
 np=${2:-1}
 # Specify the folder containing your model's MDU file.
 mdufileFolder=$case_dir
