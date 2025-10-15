@@ -3,7 +3,6 @@ export PATH=$PATH:/opt/intel/oneapi/mpi/2021.9.0/bin
 ulimit -s unlimited
 # Display usage if no arguments are provided
 
-
 #I_MPI_ROOT=/software/geocean/Delft3D/2024.03/IntelMPI/mpi/2021.9.0
 #I_MPI_MPIRUN=mpirun
 #I_MPI_HYDRA_TOPOLIB=hwloc
@@ -21,7 +20,7 @@ mdufileFolder=$case_dir
 # Specify the folder containing your DIMR configuration file.
 dimrconfigFolder=$case_dir
 
- # The name of the DIMR configuration file. The default name is dimr_config.xml. This file must already exist!
+# The name of the DIMR configuration file. The default name is dimr_config.xml. This file must already exist!
 dimrFile=dimr_config.xml
  
 # This setting might help to prevent errors due to temporary locking of NetCDF files. 
