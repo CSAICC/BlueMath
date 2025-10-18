@@ -234,18 +234,18 @@ def locations_grid_outputs(
 
 
 def transform_Offshore_spectrum(
-    CAWCR_spectrum: xr.Dataset,
+    spectrum: xr.Dataset,
     subset_parameters: Dict[str, Any],
     available_case_num: np.ndarray,
-    fixed_direction: bool = False,
+    fixed_direction: bool = True,
 ) -> Tuple[xr.Dataset, xr.Dataset]:
     """
-    Transform the wave spectra from ERA5/CAWCAR format to binwaves format.
+    Transform the wave spectra to binwaves format.
 
     Parameters
     ----------
-    CAWCR_spectrum : xr.Dataset
-        The wave spectra dataset in ERA5/CAWCAR format.
+    spectrum : xr.Dataset
+        The wave spectra dataset.
         Must contain 'efth' variable and 'frequency'/'freq' and 'direction'/'dir' dimensions.
     subset_parameters : dict
         A dictionary containing parameters for the subset processing.
@@ -258,7 +258,7 @@ def transform_Offshore_spectrum(
         The available case numbers to process.
     fixed_direction : bool, optional
         If True, skip direction convention transformation.
-        Default is False.
+        Default is True.
 
     Returns
     -------
@@ -278,12 +278,12 @@ def transform_Offshore_spectrum(
     # First, reproject the wave spectra to the binwaves format
     # Only rename if the dimensions don't already have the correct names
     rename_dict = {}
-    if "frequency" in CAWCR_spectrum.dims:
+    if "frequency" in spectrum.dims:
         rename_dict["frequency"] = "freq"
-    if "direction" in CAWCR_spectrum.dims:
+    if "direction" in spectrum.dims:
         rename_dict["direction"] = "dir"
 
-    ds = CAWCR_spectrum.rename(rename_dict) if rename_dict else CAWCR_spectrum.copy()
+    ds = spectrum.rename(rename_dict) if rename_dict else spectrum.copy()
 
     # direction convention coming from or going to
     if not fixed_direction:
@@ -302,7 +302,7 @@ def transform_Offshore_spectrum(
         try:
             closest_case = (
                 ds.efth.sel(freq=case_freq, method="nearest", tolerance=0.001)
-                .sel(dir=case_dir, method="nearest", tolerance=2)
+                .sel(dir=case_dir, method="nearest", tolerance=30)
                 .expand_dims({"case_num": [case_num]})
             )
             case_num_spectra.append(closest_case)
