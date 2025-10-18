@@ -1067,3 +1067,121 @@ def plot_spectrum_in_coastline(
     except Exception as e:
         print(f"Error in plot_spectrum_in_coastline: {str(e)}")
         raise
+
+
+def plot_wave_parameters(
+    onshore_spectra,
+    site: int = 0,
+    offshore_spectra=None,
+    title_prefix: str = "Reconstructed Onshore Wave Parameters",
+    colors: dict = None,
+):
+    """
+    Plot Hs, Tp, and Dir for an onshore reconstructed spectrum,
+    and optionally overlay offshore spectra for comparison (dashed darker lines).
+    """
+
+    # Default colors
+    if colors is None:
+        colors = {
+            "hs_on": "#0072B2",  # azul (onshore)
+            "hs_off": "#003366",  # azul oscuro (offshore)
+            "tp_on": "#009E73",  # verde (onshore)
+            "tp_off": "#004D33",  # verde oscuro (offshore)
+            "dir_on": "#D55E00",  # naranja (onshore)
+            "dir_off": "#7F3000",  # marrón oscuro (offshore)
+        }
+
+    # --- Select and prepare onshore spectra ---
+    onshore = onshore_spectra.isel(site=site)
+    if "kps" in onshore:
+        onshore = onshore.rename({"kps": "efth"})
+    onshore = onshore.squeeze().efth.spec
+
+    # --- Extract variables ---
+    hs_on = onshore.hs()
+    tp_on = onshore.tp()
+    dir_on = onshore.dpm()
+
+    # --- Prepare offshore spectra if provided ---
+    if offshore_spectra is not None:
+        offshore = offshore_spectra.squeeze()
+        if "kps" in offshore:
+            offshore = offshore.rename({"kps": "efth"})
+        offshore = offshore.efth.spec
+        hs_off = offshore.hs()
+        tp_off = offshore.tp()
+        dir_off = offshore.dpm()
+    else:
+        hs_off = tp_off = dir_off = None
+
+    # --- Plotting ---
+    fig, axes = plt.subplots(3, 1, figsize=(14, 9), sharex=True)
+
+    # 1️⃣ Hs
+    hs_on.plot(ax=axes[0], color=colors["hs_on"], lw=1.8, label="Onshore")
+    if hs_off is not None:
+        hs_off.plot(
+            ax=axes[0],
+            color=colors["hs_off"],
+            lw=1.6,
+            alpha=0.9,
+            linestyle="--",
+            label="Offshore",
+        )
+    axes[0].set_title(
+        "Significant Wave Height (Hs)",
+        fontsize=13,
+        fontweight="bold",
+        color=colors["hs_on"],
+    )
+    axes[0].set_ylabel("Hs [m]")
+    axes[0].grid(alpha=0.3)
+    axes[0].legend()
+
+    # 2️⃣ Tp
+    tp_on.plot(ax=axes[1], color=colors["tp_on"], lw=1.8, label="Onshore")
+    if tp_off is not None:
+        tp_off.plot(
+            ax=axes[1],
+            color=colors["tp_off"],
+            lw=1.6,
+            alpha=0.9,
+            linestyle="--",
+            label="Offshore",
+        )
+    axes[1].set_title(
+        "Peak Period (Tp)", fontsize=13, fontweight="bold", color=colors["tp_on"]
+    )
+    axes[1].set_ylabel("Tp [s]")
+    axes[1].grid(alpha=0.3)
+    axes[1].legend()
+
+    # 3️⃣ Direction
+    dir_on.plot(ax=axes[2], color=colors["dir_on"], lw=1.8, label="Onshore")
+    if dir_off is not None:
+        dir_off.plot(
+            ax=axes[2],
+            color=colors["dir_off"],
+            lw=1.6,
+            alpha=0.9,
+            linestyle="--",
+            label="Offshore",
+        )
+    axes[2].set_title(
+        "Mean Wave Direction (Dm)",
+        fontsize=13,
+        fontweight="bold",
+        color=colors["dir_on"],
+    )
+    axes[2].set_ylabel("Dir [°]")
+    axes[2].set_xlabel("Time")
+    axes[2].grid(alpha=0.3)
+    axes[2].legend()
+
+    # Layout
+    plt.suptitle(title_prefix, fontsize=15, fontweight="bold", y=0.94)
+    plt.tight_layout()
+    plt.show()
+
+    return fig, axes
