@@ -504,7 +504,7 @@ def plot_case_variables(
     data: xr.Dataset,
     step: int = 10,
     vmin_hs: float = 0,
-    vmax_hs: float = 1.5,
+    vmax_hs: float = 2,
     vmin_tm: float = 0,
     vmax_tm: float = 20,
     vmin_dir: float = 0,
